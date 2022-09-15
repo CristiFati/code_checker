@@ -29,7 +29,7 @@ def parse_args(*argv):
     parser.add_argument("--pattern", "-p", action="append", default=[], dest="patterns", required=True,
                         help="file pattern to search for. Can be specified multiple times. \
                         Must follow https://docs.python.org/3/library/glob.html#glob.glob rules")
-    parser.add_argument("--out_file", "-o", help="write results to file instead stdout")
+    parser.add_argument("--out_file", "-o", help="write results to file")
     parser.add_argument("--verbose", "-v", action="store_true", help="verbose mode")
     args, unk = parser.parse_known_args()
 
