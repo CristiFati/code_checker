@@ -1,0 +1,18 @@
+# Generic PY_SSIZE_T_CLEAN related data code scanning config
+
+
+markers__py_ssize_t_clean: &markers__py_ssize_t_clean
+  or:
+    - "#"
+
+root:
+  or:
+    - and:
+      - re: PyArg_.*?Parse.*?\s*?\(
+      - *markers__py_ssize_t_clean
+      - )
+    - and:
+      - re: Py_BuildValue\s*?\(
+      - *markers__py_ssize_t_clean
+      - )
+
