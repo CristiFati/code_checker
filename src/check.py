@@ -96,11 +96,13 @@ def process_file(file_name, criteria):
 
 def process_pattern(file_pattern, criteria):
     ret = {}
+    items = 0
     for item in sorted(glob.iglob(file_pattern, recursive=True)):
+        items += 1
         fname, matches = process_file(item, criteria)
         if matches:
             ret[fname] = matches
-    return ret
+    return items, ret
 
 
 def main(*argv):
@@ -126,10 +128,13 @@ def main(*argv):
     data = {}
     time_start = time.time()
 
+    items = 0
     for pat in patterns:
-        data.update(process_pattern(pat, crit))
-    print("Found {:d} occurrences ({:d} files) in {:.3f} seconds\n".format(
-        sum(len(e) for e in data.values()), len(data), time.time() - time_start))
+        pat_items, pat_data = process_pattern(pat, crit)
+        items += pat_items
+        data.update(pat_data)
+    print("Found {:d} occurrences in {:d} (out of {:d}) files, in {:.3f} seconds\n".format(
+        sum(len(e) for e in data.values()), len(data), items, time.time() - time_start))
 
     for k, v in data.items():
         print("File {:s}:\n  Line(s): {:s}".format(k, str([e[1] for e in v])[1:-1]))
