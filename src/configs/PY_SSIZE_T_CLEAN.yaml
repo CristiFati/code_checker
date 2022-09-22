@@ -8,7 +8,7 @@ markers__py_ssize_t_clean: &markers__py_ssize_t_clean
 root:
   or:
     - and:
-      - re: PyArg_.*?Parse.*?\s*?\(
+      - re: PyArg_(?:Va)??Parse(?:Tuple(?:AndKeywords)??)??\s*?\(
       - *markers__py_ssize_t_clean
       - )
     - and:
