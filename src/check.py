@@ -28,8 +28,11 @@ def parse_args(*argv):
     parser.add_argument("--cfg", "-c", required=True, help="search criteria .yaml file")
     parser.add_argument("--pattern", "-p", action="append", default=[], dest="patterns", required=True,
                         help="file pattern to search for. Can be specified multiple times. \
-                        Must follow https://docs.python.org/3/library/glob.html#glob.glob rules")
+                        MUST follow https://docs.python.org/3/library/glob.html#glob.glob rules")
     parser.add_argument("--out_file", "-o", help="write results to file")
+    parser.add_argument("--re_flag", "-r", action="append", default=[], dest="re_flags",
+                        help="flags to be specified to the reggaex pattern. "
+                             "Can be specified multiple times")
     parser.add_argument("--verbose", "-v", action="store_true", help="verbose mode")
     args, unk = parser.parse_known_args()
 
@@ -37,7 +40,14 @@ def parse_args(*argv):
         print("Warning - Ignoring unknown args: {:}".format(unk))
     if not os.path.isfile(args.cfg):
         parser.exit(status=-1, message="Config file not found\n")
-    return args.cfg, args.patterns, args.out_file, args.verbose
+    re_flags = 0
+    for flag_name in args.re_flags:
+        flag = getattr(re, flag_name, None)
+        if not isinstance(flag, re.RegexFlag):
+            parser.exit(status=-1, message="Invalid flag\n")
+        else:
+            re_flags |= flag
+    return args.cfg, args.patterns, args.out_file, re_flags, args.verbose
 
 
 def validate_config(cfg, level=0):
@@ -112,7 +122,7 @@ def process_pattern(file_pattern, criteria):
 
 
 def main(*argv):
-    cfg_file, patterns, out_file, verbose = parse_args()
+    cfg_file, patterns, out_file, re_flags, verbose = parse_args()
 
     try:
         cfg = yaml.safe_load(open(cfg_file))[KEY_ROOT]
@@ -130,7 +140,7 @@ def main(*argv):
     cr = parse_config(cfg)
     if verbose:
         print("Search pattern text: {:s}\n".format(cr))
-    crit = re.compile(cr)
+    crit = re.compile(cr, flags=re_flags)
     data = {}
     time_start = time.time()
 
