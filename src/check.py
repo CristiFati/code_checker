@@ -80,7 +80,13 @@ def parse_config(cfg):
 
 def process_file(file_name, criteria):
     matches = []
-    txt = open(file_name).read()
+    try:
+        txt = open(file_name).read()
+    except Exception as e:
+        txt = ""  # Redundant
+        fn = os.path.abspath(file_name)
+        print("Exception {:} reading {:s}".format(e, fn))
+        return fn, None
     idx = 0
     while True:
         mat = criteria.search(txt[idx:])
